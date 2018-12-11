@@ -46,7 +46,7 @@ GRASPING_FACTORS = {
 @nrp.MapRobotSubscriber('command', Topic('/arm_robot/hand_commands', std_msgs.msg.String))
 @nrp.MapVariable("last_command_executed", initial_value=None)
 @nrp.Neuron2Robot()
-def hand_control(t, command, last_command_executed,
+def hand_control (t, command, last_command_executed,
                     RANGE_MAX, GRASPING_FACTORS,
                     Index_Proximal, topic_Index_Proximal,
                     Index_Medial, topic_Index_Medial,
