@@ -16,6 +16,8 @@ GRASPING_FACTORS = {
     "Thumb": {"Thumb_Opposition": 0.8, "Thumb_Flexion": 0.2}
 }
 
+from sensor_msgs.msg import JointState
+
 @nrp.MapVariable("RANGE_MAX", initial_value=RANGE_MAX)
 @nrp.MapVariable("GRASPING_FACTORS", initial_value=GRASPING_FACTORS)
 @nrp.MapVariable("Index_Proximal", initial_value=0.0)
@@ -44,6 +46,7 @@ GRASPING_FACTORS = {
 @nrp.MapRobotPublisher("topic_thumb_distal", Topic('/robot/hand_j4/cmd_pos', std_msgs.msg.Float64))
 @nrp.MapRobotPublisher("topic_palm", Topic('/robot/hand_j5/cmd_pos', std_msgs.msg.Float64))
 @nrp.MapRobotSubscriber('command', Topic('/arm_robot/hand_commands', std_msgs.msg.String))
+@nrp.MapRobotSubscriber('arm_state', Topic('/joint_states', sensor_msgs.msg.JointState))
 @nrp.MapVariable("last_command_executed", initial_value=None)
 @nrp.Neuron2Robot()
 def hand_control (t, command, last_command_executed,
@@ -64,17 +67,29 @@ def hand_control (t, command, last_command_executed,
                     topic_thumb_distal,
                     topic_thumb_medial,
                     Thumb_Opposition, topic_Thumb_Opposition,
-                    topic_palm):
+                    topic_palm,
+                    arm_state):
 
+    
+    
+    #if arm_state.value.position[2] > 0:
+    #clientLogger.info(arm_state.value.position[2])
+    
+    #if arm_state.value.position[2] > 0:
+     #   command.value.data = "RELEASE"
+        #clientLogger.info(command.value.data)
+    
     if command.value is None:
         return
     else:
         command_str = command.value.data
+        clientLogger.info(command_str)
 
     if command_str == last_command_executed.value:
         return
 
     clientLogger.info("HAND received: {}".format(command_str))
+
 
     # Index
     def flex_index(RANGE_MAX, FACTORS, grasp):
@@ -132,7 +147,7 @@ def hand_control (t, command, last_command_executed,
         "Pinky": flex_pinky,
         "Thumb": flex_thumb
     }
-
+    
     def parse_grasping_command(cmd):
         do_grasp = None
         if cmd == "GRASP":

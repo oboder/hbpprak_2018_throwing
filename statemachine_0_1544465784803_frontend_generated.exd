@@ -234,13 +234,13 @@ with sm:
         "initial_wait_condition",
         WaitToClockState(2),
         transitions={'valid': 'initial_wait_condition',
-                     'invalid': 'display_description',
+                     'invalid': 'reset_arm',
                      'preempted': PREEMPTED}
     )
     StateMachine.add(
         "display_description",
         CBState(notify_user_cb("In this demo, the Hollie arm robot will clear the table, "
-                               "disposing of the objects into the appropriate container.")),
+                               "throw the object away.")),
         transitions={'finished': 'reset_arm'}
     )
     StateMachine.add(
@@ -335,17 +335,21 @@ with sm:
     )
 
     
-    StateMachine.add(
-        "flying_cylinder",
-        FlyingCylinderState(cylinder_name),
-        transitions = {"success": "display_clear_message",
-                    "aborted": ERROR}
-    )
+
 
     StateMachine.add(
         "display_clear_message",
         CBState(
             notify_user_cb(
                 "The Table is clear! Getting back into resting position...")),
-        transitions={'finished': 'new_cylinder'}
+        transitions={'finished': 'flying_cylinder'}
+    )
+    
+    
+    
+    StateMachine.add(
+        "flying_cylinder",
+        FlyingCylinderState(cylinder_name),
+        transitions = {"success": "new_cylinder",
+                    "aborted": ERROR}
     )
