@@ -188,6 +188,12 @@ def throw_cb():
 def reset_arm_cb():
     return send_arm_command('RESET')
 
+def prepare_throw_cb():
+    return send_arm_command('PTHROW')
+
+def again_prepare_throw_cb():
+    return send_arm_command('APTHROW')
+
 
 def open_hand_cb():
     return send_hand_command("RELEASE")
@@ -232,7 +238,7 @@ with sm:
     
     StateMachine.add(
         "initial_wait_condition",
-        WaitToClockState(2),
+        WaitToClockState(1),
         transitions={'valid': 'initial_wait_condition',
                      'invalid': 'reset_arm',
                      'preempted': PREEMPTED}
@@ -251,7 +257,7 @@ with sm:
     )
     StateMachine.add(
         'wait_reset',
-        ClockDelayState(3),
+        ClockDelayState(1),
         transitions={'valid': 'wait_reset',
                      'invalid': 'reposition',
                      'preempted': PREEMPTED}
@@ -267,7 +273,7 @@ with sm:
 
     StateMachine.add(
         "wait_condition",
-        ClockDelayState(3),
+        ClockDelayState(1),
         transitions={'valid': 'wait_condition',
                      'invalid': 'approach',
                      'preempted': PREEMPTED}
@@ -308,16 +314,39 @@ with sm:
         "wait_close_hand",
         ClockDelayState(2),
         transitions={'valid': 'wait_close_hand',
-                     'invalid': 'throw',
+                     'invalid': 'prepare_throw',
                      'preempted': PREEMPTED}
-    )
-
+     )
     StateMachine.add(
-        'throw',
-        CBState(throw_cb()),
-        transitions={'finished': 'open_hand',
+        'prepare_throw',
+        CBState(prepare_throw_cb()),
+        transitions={'finished': 'wait_prepare_throw',
                      'preempted': PREEMPTED}
     )
+    
+    StateMachine.add(
+        "wait_prepare_throw",
+        ClockDelayState(3),
+        transitions={'valid': 'wait_prepare_throw',
+                     'invalid': 'again_prepare_throw',
+                     'preempted': PREEMPTED}
+    )   
+    StateMachine.add(
+        'again_prepare_throw',
+        CBState(again_prepare_throw_cb()),
+        transitions={'finished': 'wait_again_prepare_throw',
+                     'preempted': PREEMPTED}
+    )
+    
+    StateMachine.add(
+        "wait_again_prepare_throw",
+        ClockDelayState(2),
+        transitions={'valid': 'wait_again_prepare_throw',
+                     'invalid': 'open_hand',
+                     'preempted': PREEMPTED}
+    )   
+
+
 
     StateMachine.add(
         'open_hand',
@@ -328,12 +357,25 @@ with sm:
 
     StateMachine.add(
         'wait_open_hand',
-        ClockDelayState(4),
+        ClockDelayState(0.7),
         transitions={'valid': 'wait_open_hand',
+                     'invalid': 'throw',
+                     'preempted': PREEMPTED}
+    )
+    StateMachine.add(
+        'throw',
+        CBState(throw_cb()),
+        transitions={'finished': 'wait_throw',
+                     'preempted': PREEMPTED}
+    )
+    
+    StateMachine.add(
+        "wait_throw",
+        ClockDelayState(0.5),
+        transitions={'valid': 'wait_throw',
                      'invalid': 'display_clear_message',
                      'preempted': PREEMPTED}
     )
-
     
 
 

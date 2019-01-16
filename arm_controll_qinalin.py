@@ -2,11 +2,16 @@ import numpy as np
 
 
 approach_conf = np.array([-0.5178, -0.9, 1.1781, -0.0345, -0.6, 0.0])
-grasp_conf = np.array([-0.6, -0.9, 1.1781, -0.0345, -0.6, 0.0])
-#throw_conf = np.array([1.3980, -0.9, 1.1781, -0.0345, -0.6, 0.0])
-throw_conf = np.array([-0.5178, 1.0, -1.1781, 0.0345, 0.6, 0.0])
+grasp_conf = np.array([-0.58, -0.9, 1.1781, -0.0345, -0.6, 0.0])
+# throw_conf = np.array([1.3980, -0.9, 1.1781, -0.0345, -0.6, 0.0])
+prepare_throw_conf = np.array([1, 1.25, 1.1781, -0.0345, -0.6, 1.5])
+again_prepare_throw_conf = np.array([1, 1.0, -2, -0.0, 1.6, 1.5])
+throw_conf = np.array([1, -1.0, 3, -0.0, -2,1.5])
+# config_best
+# throw_conf = np.array([-0.5178, 1.0, -1.1781, 0.0345, 0.6, 0.0])
+# throw_conf = np.array([0, 0, 0, 0, 0, 0])
 reset_conf = np.zeros(6)
-
+# reset_conf = np.array([0, 0, 0, 0, 0, 1.0])
 
 
 @nrp.MapRobotPublisher("topic_arm_1", Topic('/robot/arm_1_joint/cmd_pos', std_msgs.msg.Float64))
@@ -19,18 +24,22 @@ reset_conf = np.zeros(6)
 @nrp.MapVariable("last_command_executed", initial_value=None)
 @nrp.MapVariable("approach_conf", initial_value=approach_conf)
 @nrp.MapVariable("grasp_conf", initial_value=grasp_conf)
+@nrp.MapVariable("prepare_throw_conf", initial_value=prepare_throw_conf)
+@nrp.MapVariable("again_prepare_throw_conf", initial_value=again_prepare_throw_conf)
 @nrp.MapVariable("throw_conf", initial_value=throw_conf)
 @nrp.MapVariable("reset_conf", initial_value=reset_conf)
 @nrp.Neuron2Robot()
-def arm_controll_qinalin (t,
-                command, last_command_executed,
-                approach_conf,
-                grasp_conf,
-                throw_conf,
-                reset_conf,
-                topic_arm_1, topic_arm_2,
-                topic_arm_3, topic_arm_4,
-                topic_arm_5, topic_arm_6):
+def arm_controll_qinalin(t,
+                         command, last_command_executed,
+                         approach_conf,
+                         grasp_conf,
+                         prepare_throw_conf,
+                         again_prepare_throw_conf,
+                         throw_conf,
+                         reset_conf,
+                         topic_arm_1, topic_arm_2,
+                         topic_arm_3, topic_arm_4,
+                         topic_arm_5, topic_arm_6):
     def send_joint_config(topics_list, config_list):
         for topic, value in zip(topics_list, config_list):
             topic.send_message(std_msgs.msg.Float64(value))
@@ -50,6 +59,8 @@ def arm_controll_qinalin (t,
     commands_confs = collections.defaultdict(None, {
         "APPROACH": approach_conf.value,
             "GRASP": grasp_conf.value,
+            "PTHROW": prepare_throw_conf.value,
+            "APTHROW": again_prepare_throw_conf.value,
             "THROW": throw_conf.value,
             "RESET": reset_conf.value
     }
@@ -63,6 +74,6 @@ def arm_controll_qinalin (t,
     if new_config is not None:
         last_command_executed.value = command_str
         send_joint_config(topics_arm, new_config)
-    #log the first timestep (20ms), each couple of seconds
+    # log the first timestep (20ms), each couple of seconds
     if t % 2 < 0.02:
         clientLogger.info('Time: ', t)
