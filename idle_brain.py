@@ -9,8 +9,8 @@ __author__ = 'Jacques Kaiser'
 from hbp_nrp_cle.brainsim import simulator as sim
 import numpy as np
 
-n_sensors = 1
-n_motors = 1
+n_sensors = 3
+n_motors = 13
 
 sensors = sim.Population(n_sensors, cellclass=sim.IF_curr_exp())
 motors = sim.Population(n_motors, cellclass=sim.IF_curr_exp())

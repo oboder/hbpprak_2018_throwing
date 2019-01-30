@@ -3,13 +3,13 @@ import hbp_nrp_excontrol.nrp_states as states
 from smach import StateMachine
 from smach.state import State
 import hbp_nrp_excontrol.nrp_states as states
+import numpy as np
 
 from gazebo_msgs.srv import ApplyBodyWrench, GetModelState, DeleteModel, SpawnEntity, SpawnEntityRequest
 from geometry_msgs.msg import Wrench, Vector3, Point
 from std_msgs.msg import Float32
 import rospy
 from rospy import ServiceProxy, wait_for_service
-
 
 import smach_ros
 import smach
@@ -86,6 +86,7 @@ cylinder_sdf_xml = """
 </sdf>
 """
 
+
 class NewCylinderState(State):
     def __init__(self, cylinder_name, sdf_xml, outcomes=['success', 'aborted']):
         super(NewCylinderState, self).__init__(outcomes=outcomes)
@@ -104,6 +105,7 @@ class NewCylinderState(State):
         self._spawn_proxy(self._cylinder_msg)
         return 'success'
 
+
 class FlyingCylinderState(State):
     def __init__(self, cylinder_name, rate=1., outcomes=['success', 'aborted'], max_hit_duration=10):
         super(FlyingCylinderState, self).__init__(outcomes=outcomes)
@@ -112,13 +114,14 @@ class FlyingCylinderState(State):
         self._state_proxy = ServiceProxy('/gazebo/get_model_state',
                                          GetModelState, persistent=True)
         self._delete_proxy = ServiceProxy('/gazebo/delete_model',
-                                         DeleteModel, persistent=True)
+                                          DeleteModel, persistent=True)
         self._distance_topic = rospy.Publisher('/cylinder_distance', Float32, queue_size=10)
-        self.max_hit_duration=10
+        self.max_hit_duration = 10
 
     def execute(self, userdata):
         start_time = rospy.Time.now()
-        while not self.cylinder_lower_than(0.2) and (rospy.Time.now() - start_time) < rospy.Duration(self.max_hit_duration):
+        while not self.cylinder_lower_than(0.2) and (rospy.Time.now() - start_time) < rospy.Duration(
+                self.max_hit_duration):
             self._rate.sleep()
         cylinder_pos = self.get_cylinder_distance()
         clientLogger.advertise("Cylinder distance: {}".format(cylinder_pos))
@@ -127,12 +130,13 @@ class FlyingCylinderState(State):
         return 'success'
 
     def get_cylinder_distance(self):
-      try:
-          current_cylinder_state = self._state_proxy(cylinder_name, "world")
-      except rospy.ServiceException as exc:
-          clientLogger.error(str(exc))
-          return -1000.0
-      return -current_cylinder_state.pose.position.y
+        try:
+            current_cylinder_state = self._state_proxy(cylinder_name, "world")
+        except rospy.ServiceException as exc:
+            clientLogger.error(str(exc))
+            return -1000.0
+        return np.sqrt(
+            current_cylinder_state.pose.position.y * current_cylinder_state.pose.position.y + current_cylinder_state.pose.position.z * current_cylinder_state.pose.position.z)
 
     def cylinder_lower_than(self, z_threshold):
         try:
@@ -141,7 +145,6 @@ class FlyingCylinderState(State):
             clientLogger.info(str(exc))
             return False
         return current_cylinder_state.pose.position.z < z_threshold
-
 
 
 arm_state = rospy.Publisher(
@@ -155,6 +158,7 @@ def notify_user_cb(adv_message):
     def fun(user_data):
         clientLogger.advertise(adv_message)
         return 'finished'
+
     return fun
 
 
@@ -163,22 +167,37 @@ def send_hand_command(command):
     def fun(user_data):
         hand_state.publish(command)
         return 'finished'
+
     return fun
+
 
 def send_arm_command(command):
     @smach.cb_interface(input_keys=[], output_keys=[], outcomes=['finished', 'preempted'])
     def fun(user_data):
-        
         arm_state.publish(command)
         return 'finished'
-    return fun
-def approach_cb():
 
+    return fun
+
+
+def approach_cb():
     return send_arm_command('APPROACH')
 
 
 def grasp_move_cb():
     return send_arm_command('GRASP')
+
+
+def test_grasp_cb():
+    @smach.cb_interface(input_keys=[], output_keys=[], outcomes=['valid', 'invalid', 'preempted'])
+    def fun(user_data):
+        curr_cylinder_state = FlyingCylinderState(cylinder_name)
+        if (curr_cylinder_state.cylinder_lower_than(1.13)):
+            return 'invalid'
+        else:
+            return 'valid'
+
+    return fun
 
 
 def throw_cb():
@@ -188,8 +207,10 @@ def throw_cb():
 def reset_arm_cb():
     return send_arm_command('RESET')
 
+
 def prepare_throw_cb():
     return send_arm_command('PTHROW')
+
 
 def again_prepare_throw_cb():
     return send_arm_command('APTHROW')
@@ -218,24 +239,20 @@ def model_state_msg():
 
 gazebo_set_model_state_service = '/gazebo/set_model_state'
 
-
 FINISHED = 'FINISHED'
 ERROR = 'ERROR'
 PREEMPTED = 'PREEMPTED'
 
 sm = StateMachine(outcomes=[FINISHED, ERROR, PREEMPTED])
 
-
 with sm:
-    
     StateMachine.add(
         "new_cylinder",
         NewCylinderState(cylinder_name, cylinder_sdf_xml),
-        transitions = {"success": "initial_wait_condition",
+        transitions={"success": "initial_wait_condition",
                      "aborted": ERROR}
     )
-    
-    
+
     StateMachine.add(
         "initial_wait_condition",
         WaitToClockState(1),
@@ -243,18 +260,14 @@ with sm:
                      'invalid': 'reset_arm',
                      'preempted': PREEMPTED}
     )
-    StateMachine.add(
-        "display_description",
-        CBState(notify_user_cb("In this demo, the Hollie arm robot will clear the table, "
-                               "throw the object away.")),
-        transitions={'finished': 'reset_arm'}
-    )
+
     StateMachine.add(
         'reset_arm',
         CBState(reset_arm_cb()),
         transitions={'finished': 'wait_reset',
                      'preempted': PREEMPTED}
     )
+
     StateMachine.add(
         'wait_reset',
         ClockDelayState(1),
@@ -283,7 +296,7 @@ with sm:
         'approach',
         CBState(approach_cb()),
         transitions={'finished': 'wait_approach',
-                     
+
                      'preempted': PREEMPTED}
     )
 
@@ -299,7 +312,7 @@ with sm:
         "grasp_move",
         CBState(grasp_move_cb()),
         transitions={'finished': 'close_hand',
-                     
+
                      'preempted': PREEMPTED}
     )
 
@@ -315,38 +328,48 @@ with sm:
         ClockDelayState(2),
         transitions={'valid': 'wait_close_hand',
                      'invalid': 'prepare_throw',
+                     # 'invalid': 'test_grasp',
                      'preempted': PREEMPTED}
-     )
+    )
+
+    StateMachine.add(
+        "test_grasp",
+        CBState(test_grasp_cb()),
+        transitions={'valid': 'prepare_throw',
+                     'invalid': 'new_cylinder',
+                     'preempted': PREEMPTED}
+    )
+
+    # wait_close_hand --> throw
+
     StateMachine.add(
         'prepare_throw',
         CBState(prepare_throw_cb()),
         transitions={'finished': 'wait_prepare_throw',
                      'preempted': PREEMPTED}
     )
-    
+
     StateMachine.add(
         "wait_prepare_throw",
         ClockDelayState(3),
         transitions={'valid': 'wait_prepare_throw',
                      'invalid': 'again_prepare_throw',
                      'preempted': PREEMPTED}
-    )   
+    )
     StateMachine.add(
         'again_prepare_throw',
         CBState(again_prepare_throw_cb()),
         transitions={'finished': 'wait_again_prepare_throw',
                      'preempted': PREEMPTED}
     )
-    
+
     StateMachine.add(
         "wait_again_prepare_throw",
         ClockDelayState(2),
         transitions={'valid': 'wait_again_prepare_throw',
                      'invalid': 'open_hand',
                      'preempted': PREEMPTED}
-    )   
-
-
+    )
 
     StateMachine.add(
         'open_hand',
@@ -362,13 +385,22 @@ with sm:
                      'invalid': 'throw',
                      'preempted': PREEMPTED}
     )
+
+    # StateMachine.add(
+    #     "test_grasp",
+    #     CBState(test_grasp_cb()),
+    #     transitions={'valid': 'throw',
+    #                  'invalid': 'new_cylinder',
+    #                  'preempted': PREEMPTED}
+    # )
+
     StateMachine.add(
         'throw',
         CBState(throw_cb()),
         transitions={'finished': 'wait_throw',
                      'preempted': PREEMPTED}
     )
-    
+
     StateMachine.add(
         "wait_throw",
         ClockDelayState(0.5),
@@ -376,8 +408,6 @@ with sm:
                      'invalid': 'display_clear_message',
                      'preempted': PREEMPTED}
     )
-    
-
 
     StateMachine.add(
         "display_clear_message",
@@ -386,12 +416,10 @@ with sm:
                 "The Table is clear! Getting back into resting position...")),
         transitions={'finished': 'flying_cylinder'}
     )
-    
-    
-    
+
     StateMachine.add(
         "flying_cylinder",
         FlyingCylinderState(cylinder_name),
-        transitions = {"success": "new_cylinder",
-                    "aborted": ERROR}
+        transitions={"success": "new_cylinder",
+                     "aborted": ERROR}
     )
