@@ -14,7 +14,7 @@
 	</ns1:environmentModel>
 	<ns1:bibiConf src="bibi_configuration.bibi"/>
 	<ns1:experimentControl>
-		<ns1:stateMachine id="statemachine_0_1544465784803_frontend_generated" src="statemachine_0_1544465784803_frontend_generated.exd" xsi:type="ns1:SMACHStateMachine"/>
+		<ns1:stateMachine id="statemachine_0" src="statemachine_0.exd" xsi:type="ns1:SMACHStateMachine"/>
 	</ns1:experimentControl>
 	<ns1:cameraPose>
 		<ns1:cameraPosition x="0.84782" y="-2.38183" z="2.4"/>
