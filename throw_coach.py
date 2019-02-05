@@ -1,4 +1,7 @@
 from hbp_nrp_virtual_coach.virtual_coach import VirtualCoach
+import hbp_nrp_cle.tf_framework as nrp
+from hbp_nrp_cle.robotsim.RobotInterface import Topic
+import std_msgs
 import pandas
 import csv
 import tempfile
@@ -73,11 +76,18 @@ def record_ball_csv(t, cylinder_recorder):
 # this name has to match the name passed in the CSV transfer function
 csv_name = 'cylinder_position.csv'
 
+curr_sim_time = -1
+MAX_SIM_TIME = 15.0
+
 def save_position_csv(sim, datadir):
     with open(os.path.join(datadir, csv_name), 'wb') as f:
         cf = csv.writer(f)
         csv_data = sim.get_csv_data(csv_name)
         cf.writerows(csv_data)
+
+def set_sim_time(t):
+    global curr_sim_time
+    curr_sim_time = t
 
 
 # The function make_on_status() returns a on_status() function
@@ -86,12 +96,13 @@ def save_position_csv(sim, datadir):
 def make_on_status(sim, datadir):
     def on_status(msg):
         print("Current simulation time: {}".format(msg['simulationTime']))
-        if msg['simulationTime'] == 5.0 and sim.get_state() == 'started':
+        set_sim_time(msg['simulationTime'])
+        if msg['simulationTime'] == MAX_SIM_TIME and sim.get_state() == 'started':
+
             sim.pause()
             save_position_csv(sim, datadir)
             sim.stop()
             print("Trial terminated - saved CSV in {}".format(datadir))
-
     return on_status
 
 
@@ -113,17 +124,31 @@ def run_experiment(datadir, brain_params={'syn_weight': 1.0}):
     sim.start()
     return sim
 
+# @nrp.MapRobotSubscriber('command', Topic('/arm_robot/arm_commands', std_msgs.msg.String))
+# def get_current_state(command):
+#     if command.value is not None:
+#         return command.value.data
+#     else:
+#         return None
 
-tmp_folder = tempfile.mkdtemp()
-print('start expe !!!')
-sim = run_experiment(datadir=tmp_folder)
+def main():
+    tmp_folder = tempfile.mkdtemp()
+    print('start expe !!!')
+    sim = run_experiment(datadir=tmp_folder)
 
-# wait for sim to be finished
-while sim.get_state() != 'stopped':
-    time.sleep(3)
+    # wait for sim to be finished
+    while curr_sim_time < MAX_SIM_TIME:
+        print('[{}] still waiting...'.format(curr_sim_time))
+        time.sleep(2)
 
-csv_file = os.path.join(tmp_folder, csv_name)
-print("Recorded the following csv file: {}".format(csv_file))
+    csv_file = os.path.join(tmp_folder, csv_name)
+    print("Recorded the following csv file: {}".format(csv_file))
 
-cylinder_csv = pandas.read_csv(csv_file)
-print(cylinder_csv)
+    # csv_file = '/disk/users/boder/dev/nrp-' + csv_file[1:]
+    cylinder_csv = pandas.read_csv(csv_file)
+    print(cylinder_csv)
+
+
+
+if __name__=='__main__':
+    main()

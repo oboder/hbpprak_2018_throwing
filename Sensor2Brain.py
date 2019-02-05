@@ -14,8 +14,9 @@ def Sensor2Brain (t, cylinder_x, cylinder_y, cylinder_z):
     cylinder_state = state_proxy(model_name, "world")
     if cylinder_state.success:
         current_position = cylinder_state.pose.position
-        cylinder_x.voltage = np.abs(current_position.x) * (np.random.rand() - 1) * 2
-        cylinder_y.voltage = np.abs(current_position.y) * (np.random.rand() - 1) * 2
-        cylinder_z.voltage = np.abs(current_position.z) * (np.random.rand() - 1) * 2
-        #clientLogger.info(current_position.x, current_position.y, current_position.z)
-        #clientLogger.info(cylinder_x.voltage, cylinder_y.voltage, cylinder_z.voltage)
+        # clientLogger.info('curr_pos: {}'.format(current_position))
+        cylinder_x.amplitude = np.abs(current_position.x) * (np.random.rand() - .5) * 10
+        cylinder_y.amplitude = np.abs(current_position.y) * (np.random.rand() - .5) * 10
+        cylinder_z.amplitude = np.abs(current_position.z) * (np.random.rand() - .5) * 10
+        # clientLogger.info(current_position.x, current_position.y, current_position.z)
+        # clientLogger.info(cylinder_x.amplitude, cylinder_y.amplitude, cylinder_z.amplitude)
