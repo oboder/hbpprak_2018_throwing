@@ -8,6 +8,8 @@ import tempfile
 import time
 import os
 import logging
+import numpy as np
+import rospy
 
 # disable global logging from the virtual coach
 logging.disable(logging.INFO)
@@ -36,7 +38,7 @@ from hbp_nrp_cle.brainsim import simulator as sim
 import numpy as np
 
 n_sensors = 3
-n_motors = 13
+n_motors = 7
 
 sensors = sim.Population(n_sensors, cellclass=sim.IF_curr_exp())
 motors = sim.Population(n_motors, cellclass=sim.IF_curr_exp())
@@ -47,6 +49,10 @@ circuit = sensors + motors
 
 '''
 
+def get_syn_weights():
+    np.random.seed(42)
+    return np.random.rand(3, 7) * 5
+
 record_cylinder_tf = \
 '''
 # Imported Python Transfer Function
@@ -56,7 +62,7 @@ import sensor_msgs.msg
 @nrp.MapCSVRecorder("cylinder_recorder", filename="cylinder_position.csv",
                     headers=["Time", "px", "py", "pz"])
 @nrp.Robot2Neuron()
-def record_ball_csv(t, cylinder_recorder):
+def record_cylinder_csv(t, cylinder_recorder):
     from rospy import ServiceProxy
     from gazebo_msgs.srv import GetModelState
 
@@ -79,6 +85,8 @@ csv_name = 'cylinder_position.csv'
 curr_sim_time = -1
 MAX_SIM_TIME = 15.0
 
+curr_cylinder_distance = -1.
+
 def save_position_csv(sim, datadir):
     with open(os.path.join(datadir, csv_name), 'wb') as f:
         cf = csv.writer(f)
@@ -89,6 +97,12 @@ def set_sim_time(t):
     global curr_sim_time
     curr_sim_time = t
 
+def cylinder_callback(distance):
+    global curr_cylinder_distance
+    curr_cylinder_distance = distance.data
+
+def get_cylinder_distance():
+    rospy.Subscriber('/cylinder_distance', std_msgs.msg.Float32, cylinder_callback)
 
 # The function make_on_status() returns a on_status() function
 # This is called a "closure":
@@ -134,12 +148,17 @@ def run_experiment(datadir, brain_params={'syn_weight': 1.0}):
 def main():
     tmp_folder = tempfile.mkdtemp()
     print('start expe !!!')
-    sim = run_experiment(datadir=tmp_folder)
+    get_cylinder_distance()
+    weights = {'syn_weight': get_syn_weights().tolist()}
+    print(weights)
+    sim = run_experiment(datadir=tmp_folder, brain_params=weights)
 
     # wait for sim to be finished
     while curr_sim_time < MAX_SIM_TIME:
         print('[{}] still waiting...'.format(curr_sim_time))
         time.sleep(2)
+
+    print('Distance: {}'.format(curr_cylinder_distance))
 
     csv_file = os.path.join(tmp_folder, csv_name)
     print("Recorded the following csv file: {}".format(csv_file))
@@ -152,3 +171,8 @@ def main():
 
 if __name__=='__main__':
     main()
+
+# TODO:
+# [X] Throw only with neuron signals
+# [X] Give release release time with neuron signal (not via state machine, should be part of throw action)
+# [ ] Remove prepare throw?
