@@ -11,6 +11,8 @@ import logging
 import numpy as np
 import rospy
 
+from evolution import EvolutionaryAlgo
+
 # disable global logging from the virtual coach
 logging.disable(logging.INFO)
 logging.getLogger('rospy').propagate = False
@@ -83,7 +85,7 @@ def record_cylinder_csv(t, cylinder_recorder):
 csv_name = 'cylinder_position.csv'
 
 curr_sim_time = -1
-MAX_SIM_TIME = 15.0
+MAX_SIM_TIME = 20.0
 
 curr_cylinder_distance = -1.
 
@@ -150,22 +152,42 @@ def main():
     print('start expe !!!')
     get_cylinder_distance()
     weights = {'syn_weight': get_syn_weights().tolist()}
-    print(weights)
-    sim = run_experiment(datadir=tmp_folder, brain_params=weights)
 
-    # wait for sim to be finished
-    while curr_sim_time < MAX_SIM_TIME:
-        print('[{}] still waiting...'.format(curr_sim_time))
-        time.sleep(2)
+    evol = EvolutionaryAlgo(50, 20)
 
-    print('Distance: {}'.format(curr_cylinder_distance))
+    for gen in range(evol.generation_size):
+        print('Generation: {}'.format(gen))
+        for individual in range(evol.population_size):
+            print('Individual: {}'.format(individual))
+            # print('first: {}'.format(evol.generations[gen].individuals[0]))
+            weights = {'syn_weight': evol.get_weights(gen, individual)}
+            sim = run_experiment(datadir=tmp_folder, brain_params=weights)
 
-    csv_file = os.path.join(tmp_folder, csv_name)
-    print("Recorded the following csv file: {}".format(csv_file))
+            # wait for sim to be finished
+            while curr_sim_time < MAX_SIM_TIME:
+                # print('[{}] still waiting...'.format(curr_sim_time))
+                time.sleep(2)
 
-    # csv_file = '/disk/users/boder/dev/nrp-' + csv_file[1:]
-    cylinder_csv = pandas.read_csv(csv_file)
-    print(cylinder_csv)
+            evol.set_distance(curr_cylinder_distance, gen, individual)
+            print('Distance: {}'.format(curr_cylinder_distance))
+            global curr_cylinder_distance
+            curr_cylinder_distance = -1.
+            time.sleep(15)
+        evol.save(gen)
+        if gen < evol.generation_size-1:
+            evol.mutate()
+        global curr_sim_time
+        curr_sim_time = -1
+
+    for g in evol.generations:
+        print(g.get_elite(1))
+
+    # csv_file = os.path.join(tmp_folder, csv_name)
+    # print("Recorded the following csv file: {}".format(csv_file))
+    #
+    # # csv_file = '/disk/users/boder/dev/nrp-' + csv_file[1:]
+    # cylinder_csv = pandas.read_csv(csv_file)
+    # print(cylinder_csv)
 
 
 
