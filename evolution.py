@@ -24,7 +24,7 @@ class Population():
 
     def _mutate_individual(self, individual):
         weights = individual['weights']
-        weights += np.random.rand(3, 7) -.5
+        weights += np.random.rand(3, 7) - .5
         return self._create_individual(weights.tolist())
 
     def get_elite(self, size):
@@ -47,15 +47,14 @@ class EvolutionaryAlgo():
         return self.generations[generation].individuals[individual]['weights']
 
     def mutate(self):
-        elite = self.generations[-1].get_elite(self.population_size/2)
+        elite = self.generations[-1].get_elite(self.population_size / 2)
         self.generations += [Population(self.population_size, elite=elite)]
 
     def save(self, generation):
         filename = 'evolution_results/generation_{}.pickle'.format(generation)
         with open(filename, 'w') as f:
             pickle.dump(self.generations[generation].individuals, f)
-            print('Saved Generation {} to {}'.format(generation, filename))
-
+        return filename
 
 # evol = EvolutionaryAlgo(3,2)
 #
