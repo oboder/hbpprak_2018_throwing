@@ -136,7 +136,7 @@ class FlyingCylinderState(State):
             clientLogger.error(str(exc))
             return -1000.0
         return np.sqrt(
-            current_cylinder_state.pose.position.y * current_cylinder_state.pose.position.y + current_cylinder_state.pose.position.z * current_cylinder_state.pose.position.z)
+            current_cylinder_state.pose.position.y * current_cylinder_state.pose.position.y + current_cylinder_state.pose.position.x * current_cylinder_state.pose.position.x)
 
     def cylinder_lower_than(self, z_threshold):
         try:
