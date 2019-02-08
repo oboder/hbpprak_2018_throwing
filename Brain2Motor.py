@@ -2,6 +2,8 @@
 import hbp_nrp_cle.tf_framework as nrp
 from hbp_nrp_cle.robotsim.RobotInterface import Topic
 import gazebo_msgs.msg
+
+
 @nrp.MapSpikeSink("arm_1_forward_neuron", nrp.brain.motors[0], nrp.population_rate)
 @nrp.MapSpikeSink("arm_2_forward_neuron", nrp.brain.motors[1], nrp.population_rate)
 @nrp.MapSpikeSink("arm_3_forward_neuron", nrp.brain.motors[2], nrp.population_rate)
@@ -18,15 +20,17 @@ import gazebo_msgs.msg
 @nrp.MapRobotSubscriber('command', Topic('/arm_robot/arm_commands', std_msgs.msg.String))
 @nrp.MapRobotPublisher('hand_command', Topic('/arm_robot/hand_commands', std_msgs.msg.String))
 @nrp.Neuron2Robot()
-def Brain2Motor (t, arm_1_forward_neuron, arm_2_forward_neuron, arm_3_forward_neuron, arm_4_forward_neuron, arm_5_forward_neuron, arm_6_forward_neuron, arm_1, arm_2, arm_3, arm_4, arm_5, arm_6, command, hand_neuron, hand_command):
+def Brain2Motor(t, arm_1_forward_neuron, arm_2_forward_neuron, arm_3_forward_neuron, arm_4_forward_neuron,
+                arm_5_forward_neuron, arm_6_forward_neuron, arm_1, arm_2, arm_3, arm_4, arm_5, arm_6, command,
+                hand_neuron, hand_command):
     if command.value is None:
         return
     else:
         command_str = command.value.data
-    #clientLogger.info("neuro received:{}".format(command_str))
+    # clientLogger.info("neuro received:{}".format(command_str))
     if (command_str != "THROW"):
         return
-    #clientLogger.info("neural arm")
+    # clientLogger.info("neural arm")
     arm_1_position = arm_1_forward_neuron.rate
     arm_2_position = arm_2_forward_neuron.rate
     arm_3_position = arm_3_forward_neuron.rate
@@ -34,14 +38,15 @@ def Brain2Motor (t, arm_1_forward_neuron, arm_2_forward_neuron, arm_3_forward_ne
     arm_5_position = arm_5_forward_neuron.rate
     arm_6_position = arm_6_forward_neuron.rate
     hand_release = hand_neuron.rate
-    #if (arm_1_position != 0.0):
-        #clientLogger.info(arm_1_position, arm_2_position, arm_3_position, arm_4_position, arm_5_position, arm_6_position)
+    # if (arm_1_position != 0.0):
+    # clientLogger.info(arm_1_position, arm_2_position, arm_3_position, arm_4_position, arm_5_position, arm_6_position)
     arm_1.send_message(std_msgs.msg.Float64(arm_1_position))
     arm_2.send_message(std_msgs.msg.Float64(arm_2_position))
     arm_3.send_message(std_msgs.msg.Float64(arm_3_position))
     arm_4.send_message(std_msgs.msg.Float64(arm_4_position))
     arm_5.send_message(std_msgs.msg.Float64(arm_5_position))
-    arm_6.send_message(std_msgs.msg.Float64(arm_6_position))
+    # arm_6.send_message(std_msgs.msg.Float64(arm_6_position))
+    arm_6.send_message(std_msgs.msg.Float64(1.5))
     if (hand_release > 10.0):
         # clientLogger.info("RELEASE HAND!!!")
         hand_command.send_message(std_msgs.msg.String('RELEASE'))

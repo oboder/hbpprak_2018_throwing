@@ -1,6 +1,9 @@
 import numpy as np
 import pickle
 
+mask = np.array([[0., 1., 1., 0., 1., 0., 1.]] * 3)
+mask2 = np.array([[0., 0., 0., 0., 0., 1.5, 0.]] * 3)
+
 
 class Population():
 
@@ -20,16 +23,27 @@ class Population():
             return {'weights': weights, 'distance': -1.}
 
     def _get_syn_weights(self):
-        return (np.random.rand(3, 7) * 5).tolist()
+        weights = (np.random.rand(3, 7) * 5)
+        return (weights * mask + mask2).tolist()
 
     def _mutate_individual(self, individual):
         weights = individual['weights']
         weights += np.random.rand(3, 7) - .5
+        weights *= mask
+        weights += mask2
         return self._create_individual(weights.tolist())
 
     def get_elite(self, size):
         size = min(size, len(self.individuals))
         return sorted(self.individuals, key=lambda i: i['distance'], reverse=True)[:size]
+
+    def get_population_size(self):
+        return len(self.individuals)
+
+    def load(self, filename):
+        with open(filename, 'r') as f:
+            individuals = pickle.load(f)
+        self.individuals = individuals
 
 
 class EvolutionaryAlgo():
@@ -50,11 +64,21 @@ class EvolutionaryAlgo():
         elite = self.generations[-1].get_elite(self.population_size / 2)
         self.generations += [Population(self.population_size, elite=elite)]
 
+    def _get_filename(self, generation):
+        return 'evolution_results/generation_{}.pickle'.format(generation)
+
     def save(self, generation):
-        filename = 'evolution_results/generation_{}.pickle'.format(generation)
+        filename = self._get_filename(generation)
         with open(filename, 'w') as f:
             pickle.dump(self.generations[generation].individuals, f)
         return filename
+
+    def load(self, generation):
+        filename = self._get_filename(generation)
+        pop = Population(self.population_size)
+        pop.load(filename)
+        self.population_size = pop.get_population_size()
+        self.generations = [pop]
 
 # evol = EvolutionaryAlgo(3,2)
 #

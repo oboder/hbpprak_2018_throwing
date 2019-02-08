@@ -3,6 +3,7 @@ import std_msgs
 import time
 import logging
 import rospy
+import argparse
 
 from evolution import EvolutionaryAlgo
 
@@ -58,6 +59,7 @@ def test_weights(sim, weights):
         # print('[{}] still waiting...'.format(curr_sim_time))
         time.sleep(2)
 
+    sim.pause()
     distance = curr_cylinder_distance
 
     # reset distance
@@ -69,7 +71,7 @@ def test_weights(sim, weights):
     return distance
 
 
-def main():
+def init_logger():
     # logging config
     logging.basicConfig(
         filename='/home/nrpuser/.opt/nrpStorage/template_manipulation_0/evolution_results/evolution.log', filemode='a')
@@ -79,6 +81,24 @@ def main():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
+    return logger
+
+
+def init_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-g', '--generations', dest='num_generations', type=int, default=5,
+                        help='number of generations')
+    parser.add_argument('-p', '--population', dest='population_size', type=int, default=4,
+                        help='population size')
+    args = parser.parse_args()
+    return vars(args)
+
+
+def main():
+    logger = init_logger()
+    args = init_parser()
+    num_generations = args['num_generations']
+    population_size = args['population_size']
 
     subscribe_cylinder_distance()
 
@@ -90,8 +110,6 @@ def main():
     sim = vc.launch_experiment('template_manipulation_0')
 
     # create evolution
-    num_generations = 5
-    population_size = 4
     evol = EvolutionaryAlgo(num_generations, population_size)
 
     for gen in range(evol.generation_size):
@@ -116,6 +134,8 @@ def main():
         # mutate generation
         if gen < evol.generation_size - 1:
             evol.mutate()
+        # reset simulation
+        # sim.reset('full')
 
     # stop simulation
     sim.stop()
