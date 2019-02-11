@@ -2,7 +2,7 @@
 import numpy as np
 
 approach_conf = np.array([-0.5178, -0.9, 1.1781, -0.0345, -0.6, 0.0])
-grasp_conf = np.array([-0.58, -0.9, 1.1781, -0.0345, -0.6, 0.0])
+grasp_conf = np.array([-0.54, -0.9, 1.1781, -0.0345, -0.6, 0.0])
 throw_conf = np.array([0, 1, 0, -0.0345, -0.6, 0.0])
 prepare_throw_conf = np.array([0, 1.25, 1.1781, -0.0345, -0.6, 1.5])
 again_prepare_throw_conf = np.array([0, 1.0, -2, -0.0, 1.6, 1.5])
@@ -80,7 +80,8 @@ def arm_controll_qinalin(t,
         "PTHROW": prepare_throw_conf.value,
         "APTHROW": again_prepare_throw_conf.value,
         "THROW": throw_conf.value,
-        "RESET": reset_conf.value
+        "RESET": reset_conf.value,
+        "DONE": reset_conf.value
     }
                                              )
     split_command = command_str.split('_')

@@ -59,7 +59,8 @@ def test_weights(sim, weights):
         # print('[{}] still waiting...'.format(curr_sim_time))
         time.sleep(2)
 
-    sim.pause()
+    # sim.pause()
+    # time.sleep(1)
     distance = curr_cylinder_distance
 
     # reset distance
@@ -68,6 +69,7 @@ def test_weights(sim, weights):
 
     # reset sim
     sim.reset('full')
+    # time.sleep(3)
     return distance
 
 
@@ -90,6 +92,9 @@ def init_parser():
                         help='number of generations')
     parser.add_argument('-p', '--population', dest='population_size', type=int, default=4,
                         help='population size')
+    parser.add_argument('-m', '--mutation', dest='mutation', default='random',
+                        help='mutation type')
+    parser.add_argument('-l', '--load', dest='load', type=int, default=None)
     args = parser.parse_args()
     return vars(args)
 
@@ -99,8 +104,19 @@ def main():
     args = init_parser()
     num_generations = args['num_generations']
     population_size = args['population_size']
+    mutation = args['mutation']
+    load = args['load']
 
     subscribe_cylinder_distance()
+
+    # create evolution
+    evol = EvolutionaryAlgo(num_generations, population_size, mutation=mutation)
+    if load:
+        logger.warning('load generation {}'.format(load))
+        try:
+            evol.load(load)
+        except:
+            raise ValueError('Could not load generation: {}'.format(load))
 
     # log into the virtual coach
     vc = VirtualCoach(environment='local', storage_username='nrpuser', storage_password='password')
@@ -109,13 +125,13 @@ def main():
     logger.warning('start expe !!!')
     sim = vc.launch_experiment('template_manipulation_0')
 
-    # create evolution
-    evol = EvolutionaryAlgo(num_generations, population_size)
-
     for gen in range(evol.generation_size):
-        logger.warning('Generation: {}/{}'.format(gen + 1, num_generations))
+        logger.warning('Generation: {}/{}'.format(gen + 1, evol.generation_size))
         for individual in range(evol.population_size):
-            logger.warning('Individual: {}/{}'.format(individual + 1, population_size))
+            logger.warning('Individual: {}/{}'.format(individual + 1, evol.population_size))
+            # set id
+            evol.set_id(gen, individual)
+            logger.warning('ID: {}'.format(evol.get_id(gen, individual)))
 
             # get weights
             weights = evol.get_weights(gen, individual)
@@ -135,7 +151,7 @@ def main():
         if gen < evol.generation_size - 1:
             evol.mutate()
         # reset simulation
-        # sim.reset('full')
+        sim.reset('full')
 
     # stop simulation
     sim.stop()
