@@ -7,7 +7,7 @@ Careful - as of now - a symlink instead of a copy won't work.
 
 ```bash
 cd ~/.opt/nrpStorage
-git clone git@github.com:HBPNeurorobotics/hbpprak_2018_throwing.git
+git clone git@github.com:oboder/hbpprak_2018_throwing.git
 ```
 
 ## Challenge
