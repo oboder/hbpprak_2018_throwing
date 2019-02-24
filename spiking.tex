@@ -1,2 +1,12 @@
 \section{Spiking Neural Networks}
-\todo{max}
+Spiking neural networks try to mimic natural neural networks.
+The neurons in these networks are connected via synapses in a directed graph.
+Every neuron in the network has a membrane potential.
+If this potential exceeds a certain threshold the neuron fires meaning it sends a spike to all its succeeding neurons in the network and its potential is reset.
+If a neuron receives a spike from a predecessor its membrane potential rises or falls depending on the synaptic weight, in the periods between spikes the neurons leeks some of their potential.
+To learn with a spiking neural network you change the weights of the synapses.
+These weights determine how much influence a spike has on the potential of a succeeding neuron.
+In contrast to other artificial neural networks the neurons don't have to be organized in strict layers and not all neurons in a layer need to be computed at the same time.
+The information is less encoded in the neurons values and more in the timing of the spikes.
+However it is harder to learn spiking neural networks because the spikes aren't differentiable which means you can't learn using backpropagation.
+One possibility to learn the weights are evolutionary algorithms.
