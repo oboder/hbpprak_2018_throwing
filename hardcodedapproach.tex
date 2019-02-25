@@ -4,20 +4,21 @@ The tasks of "Hard-code Approach" involves mainly about defining various states 
 
 \subsection{State Machine}
 
-Such as the picture shown in Fig.1 there are 5 states in state mashine, and they communicate with 2 control interface: Arm Control and Hand Control.These states: Approach, Prepare, Throw give Arm Control commands(string typ) via ROS, and states: Grasp, Release give Hand Control. In these two Control Interfase , each instruction corresponds to parameters for the control of robot.These parameters were originally obtained empirically and then optimized by evolutionary algorithms later. 
+Such as the picture shown in \autoref{fig:statemachine} there are 5 states in state mashine, and they communicate with 2 control interface: Arm Control and Hand Control.These states: Approach, Prepare, Throw give Arm Control commands(string typ) via ROS, and states: Grasp, Release give Hand Control. In these two Control Interfase , each instruction corresponds to parameters for the control of robot.These parameters were originally obtained empirically and then optimized by evolutionary algorithms later. 
 
 The state of Throw and Release was originally designed to execute Release state after Throw state has been executed for a short time, in order to get a farther throw distance.But because of the bug of model, this will break the entire simulation.So these two states can only be executed at the some time. 
 
 \begin{figure}[tpb]
 \centering
 	\includegraphics[width=0.96\linewidth]{figures/1.png} 
-	\caption{State and Control Interface}\label{fig:scene}
+	\caption{State and Control Interface}
 	\vspace{-0.4cm}
+	\label{fig:statemachine}
 \end{figure}
 
 \subsection{Inverse Kinematics}
 
-The ability to grab a cylinder anywhere on the table is achieved by inverse Kinematic. Because the camera in the model cannot get the depth value of the object, its coordinates are not available through the camera. So as a simplification, when the cylinder is generated, its world coordinates are immediately posted to a topic. As shown in Figure 2，we assume that the cylinder posion ist $(C_x, C_y, C_z)$, and the robitic origin position is  $(R_x, R_y, R_z)$, so the amr0 move configution $M_0$ can be caculate with the equation below:
+The ability to grab a cylinder anywhere on the table is achieved by inverse Kinematic. Because the camera in the model cannot get the depth value of the object, its coordinates are not available through the camera. So as a simplification, when the cylinder is generated, its world coordinates are immediately posted to a topic. As the picture shown in \autoref{fig:top}，we assume that the cylinder posion ist $(C_x, C_y, C_z)$, and the robitic origin position is  $(R_x, R_y, R_z)$, so the amr0 move configution $M_0$ can be caculate with the equation below:
 
 
 \begin{equation}
@@ -36,12 +37,13 @@ M_0=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 \begin{figure}[htpb]
 \centering
 	\includegraphics[width=0.96\linewidth]{figures/3.png} 
-	\caption{Platform top view}\label{fig:scene}
+	\caption{Platform top view}
 	\vspace{-0.4cm}
+	\label{fig:top}
 \end{figure}
 
 
-The figure.3 show the look of the model from the right side. Since there is already a perfect configution that makes the robot close to the cylinder(that means $\beta$ and $\gamma$ is known).So the lengs of arm1: a and arm4: b can be caculated with:
+The \autoref{fig:right} show the look of the model from the right side. Since there is already a perfect configution that makes the robot close to the cylinder(that means $\beta$ and $\gamma$ is known).So the lengs of arm1: a and arm4: b can be caculated with:
 
 \begin{equation}
 \begin{aligned}
@@ -68,8 +70,9 @@ M_6=\gamma=arccos((b^2+c^2-a^2)/2*b*c)\\
 \begin{figure}[tpb]
 \centering
 	\includegraphics[width=0.96\linewidth]{figures/4.png} 
-	\caption{Platform right view}\label{fig:scene}
+	\caption{Platform right view}
 	\vspace{-0.4cm}
+	\label{fig:right}
 \end{figure}
 
 
