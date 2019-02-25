@@ -1,12 +1,16 @@
 \section{Hard-coded Approach}
 \label{sec:hard-coded}
-The tasks of "Hard-code Approach" involves mainly about defining various states for the robot, giving parameters empirically for each state, and trying to grab Cylinder anywhere on the table.In this case the evolutionary algorithm does not need to consider how to optimize the order of the various states and the duration of each state but only needs to optimize the motion parameters in each state. So that it can get a relatively better effect in a shorter time.
+In the hard-coded approach various states were defined each corresponding to a position of the robot.
+A state machine cycles through the states and sends control messages to two scripts controlling the robot.
+The positions were initially determined empirically and later generalised with a set of equations to enable the robot to grab the cylinder from different positions on the table.
 
 \subsection{State Machine}
-
-Such as the picture shown in \autoref{fig:statemachine} there are 5 states in state mashine, and they communicate with 2 control interface: Arm Control and Hand Control.These states: Approach, Prepare, Throw give Arm Control commands(string typ) via ROS, and states: Grasp, Release give Hand Control. In these two Control Interfase , each instruction corresponds to parameters for the control of robot.These parameters were originally obtained empirically and then optimized by evolutionary algorithms later. 
-
-The state of Throw and Release was originally designed to execute Release state after Throw state has been executed for a short time, in order to get a farther throw distance.But because of the bug of model, this will break the entire simulation.So these two states can only be executed at the some time. 
+As shown in \autoref{fig:statemachine} 5 states were used to control the robots movement: \textit{Approach}, \textit{Grasp}, \textit{Prepare}, \textit{Throw} and \textit{Release}.
+The first two states let the robot approache and grasp the cylinder.
+In \textit{Prepare} the robot reaches back to prepare for its throw.
+In the last two states the robot executes the actual throwing motion and releases the cylinder at the end.
+Each time a new state is reached the state machine sends a message via ROS to the respective control script: \textit{Hand Control} or \textit{Arm Control}.
+These control scripts then choose a configuration according to the current state and adjusted the robots pose.
 
 \begin{figure}[tpb]
 \centering
@@ -16,23 +20,16 @@ The state of Throw and Release was originally designed to execute Release state 
 	\label{fig:statemachine}
 \end{figure}
 
+
 \subsection{Inverse Kinematics}
-
-The ability to grab a cylinder anywhere on the table is achieved by inverse Kinematic. Because the camera in the model cannot get the depth value of the object, its coordinates are not available through the camera. So as a simplification, when the cylinder is generated, its world coordinates are immediately posted to a topic. As the picture shown in \autoref{fig:top}，we assume that the cylinder posion ist $(C_x, C_y, C_z)$, and the robitic origin position is  $(R_x, R_y, R_z)$, so the amr1 move configution $M_1$ can be caculate with the equation below:
-
+To grab the cylinder from different positions on the table the robots inverse kinematics are used to determine the joint angles.
+When a new cylinder is spawned in the simulation its position gets published to a ROS topic.
+If the cylinder position is $(C_x, C_y, C_z)$ and the robots position is $(R_x, R_y, R_z)$ the angle of the first joint can be calculated as follows:
 
 \begin{equation}
 \label{simple_equation}
 M_1=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 \end{equation}
-
-
-
-
-
-
-
-
 
 \begin{figure}[htpb]
 \centering
@@ -43,20 +40,20 @@ M_1=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 \end{figure}
 
 
-The \autoref{fig:right} show the look of the model from the right side. Since there is already a perfect configution that makes the robot close to the cylinder(that means $\beta$ and $\gamma$ is known).So the lengs of arm2: a and arm4: b can be caculated with:
+\autoref{fig:right} shows the scene from the side.
+Using the empirically determined values from the hard-coded grasp the length of the robots arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated:
 
 \begin{equation}
 \begin{aligned}
-a=c*sin(\gamma)/sin(\delta)\\b=c*sin(\beta)/sin(\delta)\\ 
-\textbf{with}\ c=\sqrt{(R_x-C_x)^2+(R_y-C_y)^2}\\\delta=2*\pi-\beta-\gamma.
+\delta=2*\pi-\beta-\gamma\\
+c=\sqrt{(R_x-C_x)^2+(R_y-C_y)^2}\\
+\textit{Arm\_2}=c*sin(\gamma)/sin(\delta)\\
+\textit{Arm\_4}=c*sin(\beta)/sin(\delta)\\
 \end{aligned}
 \end{equation}
 
-
-
-When the cylinder is created anywhere on the table, the move configuration of arm2:$M_2$ amr4: $M_4$, arm6: $M_6$ can be caculate with equation below since amr1 and arm4 lengs are known.The move configutions for arm3, amr5 remain the same as before. 
- 
-
+With the lengths of the arm segments now known the remaining angles can be computed using the equations below.
+The angles for the third and fifth joint are 0.
 
 \begin{equation}
 \begin{aligned}
