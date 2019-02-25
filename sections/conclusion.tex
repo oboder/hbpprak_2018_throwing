@@ -13,5 +13,12 @@ However, results are not comparable due to non-deterministic behavior.
 \subsection{Future Work} % (fold)
 \label{sub:future_work}
 \todo{}
+Having set a basis for learning the robot's parameters, different population sizes and numbers of generations with different mutation strategies could be compared in the evolutionary algorithm.
+Moreover, finding a good initial synaptic weight configuration could help to converge faster towards a desired solution.
+However, unconventional solutions, such as fast and wild spinnings of the robot, that don't look like natural and realizable throwing, may not be among the solutions.
+To reduce the number of parameters, it could be considerable to use only the y coordinate of the cylinder as an input, assuming that the cylinder is thrown in y direction.
+In order to not only learn the throwing sequence, the grasping part could also be learned.
+The learning process in general could be supported by other inputs such as cameras or haptic sensors.
+Finally, artificial neural networks could be used for learning in comparison to evolutionary algorithms.
 
 % subsection future_work (end)
