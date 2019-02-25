@@ -2,7 +2,8 @@
 Spiking neural networks try to mimic natural neural networks more closely than other artificial neural networks.
 The neurons in spiking neural networks are connected via synapses in a directed graph.
 Every neuron in the network has a membrane potential.
-If this potential exceeds a certain threshold the neuron fires meaning it sends a spike to all its succeeding neurons in the network and its potential is reset.
+If this potential exceeds a certain threshold the neuron fires meaning it sends a spike to all its succeeding neurons in the network.
+The potential of the spiking neuron is then reset and it enters a small refractory period in which it can't fire again.
 If a neuron receives a spike from a predecessor its membrane potential rises or falls depending on the synaptic weight, in the periods between spikes the neurons leeks some of their potential.
 To learn with a spiking neural network the weights of the synapses are changed.
 These weights determine how much influence a spike has on the potential of a succeeding neuron.
