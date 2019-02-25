@@ -1,3 +1,10 @@
-\section{Problems}\label{problems}
-
-\todo{}
+\section{Problems}\label{sec:problems}
+While working on the challenge we experienced some problems with the neurorobotics platform itself as well as the infrastructure around it provided to us.
+The simulations in the neurorobotics platform were non-deterministic which lead to non-reproducible results.
+This non-determinism probably results from floating point inaccuracy.
+In addition to that the grasping of the cylinder was very unreliable.
+If the cylinder was grasped too tightly the robot started shaking, sometimes resulting in the hand exploding and the cylinder flying huge distances.
+In some extreme cases the hole table the robot was mounted to moved which resulted in the grasping not working afterwards.
+We also had problems with the platform crashing regularly because of different reasons.
+All these problems occurred on the server install of the platform.
+In absence of a working local install we couldn't check if they were specific to the server install or the platform itself.
