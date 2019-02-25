@@ -5,7 +5,15 @@ They try to approximate a solution following the principle of survival of the fi
 In fact, an evolutionary algorithm models a population consisting of several individuals performing a task, such as an optimization problem, and are evaluated by a fitness function.
 The elite of this population, i.e. the individuals performing best according their fitness, is then selected to evolve the population.
 This allows the population to evolve towards a solution.
-The evolution of a population corresponds to the mutation of individuals. 
+The evolution of a population corresponds to the mutation of individuals.
+The evolution process is depicted in \autoref{fig:ea}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.7\columnwidth]{figures/ea_fig.pdf}
+\caption{An illustration of an evolutionary algorithm learning.}
+\label{fig:ea}
+\end{figure}
 
 To mutate a population, the crossover strategy can be applied.
 Crossover is used to generate new offspring by combining genetic information of two parents.
