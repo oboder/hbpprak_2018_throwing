@@ -4,11 +4,14 @@ Spiking neural networks try to mimic natural neural networks more closely than o
 The neurons in spiking neural networks are connected via synapses in a directed graph.
 Every neuron in the network has a membrane potential.
 If this potential exceeds a certain threshold the neuron fires meaning it sends a spike to all its succeeding neurons in the network.
-The potential of the spiking neuron is then reset and it enters a small refractory period in which it can't fire again.
-If a neuron receives a spike from a predecessor its membrane potential rises or falls depending on the synaptic weight, in the periods between spikes the neurons leeks some of their potential.
-To learn with a spiking neural network the weights of the synapses are changed.
+The potential of the spiking neuron is then reset and it enters a short refractory period in which it can't fire again.
+If a neuron receives a spike from a predecessor its membrane potential rises or falls depending on the synaptic weight, in the periods between spikes the neurons leek some of their potential\cite{b1}.
+
+To learn with a spiking neural network the weights of the synapses have to be changed.
 These weights determine how much influence a spike has on the potential of a succeeding neuron.
 In contrast to other artificial neural networks the neurons don't have to be organized in strict layers and not all neurons in a layer need to be computed at the same time.
-The information is less encoded in the neurons values and more in the timing of the spikes.
+The information is less encoded in the neurons values and more in the timing of the spikes\cite{b2}.
 However it is harder to learn with spiking neural networks because the spikes aren't differentiable which means you can't learn using backpropagation.
 One possibility to learn the weights are evolutionary algorithms.
+
+Spiking neural networks are a option for robot controlling tasks as they try to simulate biological neural networks as good as possible and offer advantages in speed energy efficiency and computation capabilities\cite{b3}.

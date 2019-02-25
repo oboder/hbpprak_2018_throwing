@@ -1,5 +1,6 @@
 % !TEX root = ../Ausarbeitung.tex
 \section{Learned Approaches}
+\label{sec:learned}
 The next approach was trying to learn some of the movements instead of hard-coding them.
 We used an evolutionary approach to learn weights for a spiking neural network which controls the robots movements.
 
@@ -8,7 +9,6 @@ In this approach the robot is controlled by a spiking neural network which can b
 The network has three input and seven output neurons which are fully connected.
 The three dimensional position of the cylinder is used for the input neurons.
 Six of the output neurons control the six joints of the robots arm and the last neuron controls when the hand should release the cylinder.
-The position values of the cylinder are directly
 
 The individuals of our evolutionary algorithm are lists of 21 values each representing one weight of the network.
 To evaluate the individuals a throw is simulated and the distance of the cylinder from the table represents the fitness of the individual.
