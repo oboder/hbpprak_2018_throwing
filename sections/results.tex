@@ -1,8 +1,9 @@
 \section{Results}
 \label{sec:results}
-In the first approach the robot was enables to grasp the cylinder at random positions on the table and throw it using a set of empirically determined parameters.
+In the first approach, the robot is enabled to grasp the cylinder at random positions on the table and to throw it using a set of empirically determined parameters.
 The second approach tries to learn a set of synaptic weights using an evolutionary algorithm.
-However the problems described in \autoref{sec:problems} make it very hard to learn anything.
-The individuals of the evolutionary algorithm can execute throws but due to glitches in the simulation, like the shaking and exploding hand (\autoref{fig:dispersed}), the measured distances are not representative for the quality of the movement.
-In addition the non-determinism in the simulation makes it even harder to compare the results as the same individual gets different distances if executed multiple times.
+However, the problems described in \autoref{sec:problems} make it very hard to learn anything.
+The individuals of the evolutionary algorithm can execute throws, but due to glitches in the simulation, like the shaking and exploding hand (\autoref{fig:dispersed}), the measured distances are not representative for the quality of the movement.
+In addition, the non-determinism in the simulation makes it even harder to compare the results as the same individual gets different distances when executed multiple times.
 That results in the algorithm not really learning anything and evolving the weights rather randomly.
+Finally, the crashing platform doesn't allow to run the algorithm for sufficient generations.
