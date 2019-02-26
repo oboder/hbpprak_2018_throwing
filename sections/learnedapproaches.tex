@@ -5,7 +5,7 @@ The next approach tries to learn some of the movements instead of hard-coding th
 An evolutionary approach is used to learn weights for a spiking neural network which controls the robots movements.
 
 \subsection{Evolutionary Approach}
-In this approach the robot is controlled by a spiking neural network.
+In this approach the throwing motion is controlled by a spiking neural network.
 The networks topology is illustrated in \autoref{fig:network}.
 It has three input and seven output neurons which are fully connected.
 The three dimensional position of the cylinder is used for the input neurons.
@@ -15,6 +15,12 @@ The absolute value of the cylinders position is directly set as the amplitude of
 This results in the spike rate of the neurons increasing as the absolute position values of the cylinder increase.
 The spike rate of the first six output neurons is passed to the arm joints as a position which produces a movement of the arm.
 The spikes of the seventh output neuron control the release of the cylinder, optimally resulting in the cylinder flying away.
+A typical spike train of the input neurons is depicted in \autoref{fig:spike}.
+There aren't many spikes in the \textit{Approach} and \textit{Grasp} states as the cylinder is on the table and close to the origin.
+As the robot reaches back first the \textit{Z} and then the \textit{Y} coordinate gets bigger and the corresponding neurons starts firing.
+At the end the neural network takes control over the arm to execute the throwing motion.
+The spikes now depend on the motion the net dictates the robot as the cylinder is still in the hand.
+Afterwards, as soon as the cylinder leaves the hand the spike rates of all input neurons would increase as the cylinder flies away.
 
 \begin{figure}[h]
 \centering
