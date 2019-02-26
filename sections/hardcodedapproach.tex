@@ -37,8 +37,8 @@ M_1=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 	\label{fig:top}
 \end{figure}
 
-Using the empirically determined configuration for the initial hard-coded grasp, the length of the robot arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated.
-For reference see \autoref{fig:right}.
+Using the empirically determined configuration for the initial hard-coded grasp, the length of the robot arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated (\autoref{eq:c}).
+For reference, see \autoref{fig:right}.
 
 \begin{equation}
 \begin{aligned}
@@ -46,6 +46,7 @@ For reference see \autoref{fig:right}.
 c=\sqrt{(R_x-C_x)^2+(R_y-C_y)^2}\\
 \textit{Arm\_2}=c*sin(\gamma)/sin(\delta)\\
 \textit{Arm\_4}=c*sin(\beta)/sin(\delta)\\
+\label{eq:c}
 \end{aligned}
 \end{equation}
 
