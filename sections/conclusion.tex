@@ -1,22 +1,20 @@
 % !TEX root = ../Ausarbeitung.tex
 \section{Conclusion}
 \label{sec:conclusion}
-\todo{}
 Two different approaches are presented to make the robot arm throw the cylinder.
 The first approach controls the robot arm with hard-coded configurations which have been determined empirically.
-This not only involves the static movements of the robot, but also grasping the cylinder at random positions reliably which is computed with inverse kinematics.
+This not only involves the static movements of the robot, but also grasping the cylinder at random positions reliably, which is computed with inverse kinematics.
 The second approach aims for a learned solution based on spiking neural networks.
 For this purpose, an evolutionary algorithm has been chosen in order to optimize the synaptic weights.
-Given the circumstances, various approaches have been implemented that lead to reasonably results.
-However, results are not comparable due to non-deterministic behavior.
+Given the circumstances, various approaches have been implemented that lead to reasonable results.
+However, the results are not comparable due to the non-deterministic behavior of the simulation platform.
 
 \subsection{Future Work} % (fold)
 \label{sub:future_work}
-\todo{}
 Having set a basis for learning the networks parameters, different population sizes and numbers of generations with different mutation strategies could be compared in the evolutionary algorithm.
 Moreover, finding a good set of initial synaptic weights could help to converge faster towards a desired solution.
 However, unconventional solutions, such as fast and wild spinnings of the robot, that don't look like natural and realizable throwing movements, may, in that case, not be among the solutions.
-To further reduce the number of parameters, it could be considerable to use only the y coordinate of the cylinder as an input, assuming that the cylinder is thrown in y direction.
+To further reduce the number of parameters, it could be considerable to use only the $y$-coordinate of the cylinder as an input, assuming that the cylinder is thrown in $y$-direction.
 In order to not only learn the throwing sequence, the grasping part could also be learned.
 The learning process in general could be supported by other inputs such as cameras or haptic sensors, but these would again increase the number of parameters to be learned.
 Finally, artificial neural networks could be used for learning in comparison to evolutionary algorithms.
