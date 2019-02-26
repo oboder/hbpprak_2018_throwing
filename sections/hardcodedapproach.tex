@@ -1,11 +1,11 @@
 \section{Hard-coded Approach}
 \label{sec:hard-coded}
-In the hard-coded approach various states were defined each corresponding to a position of the robot.
-A state machine cycles through the states and sends control messages to two scripts controlling the robot.
+In the hard-coded approach various states were defined each corresponding to a pose of the robot arm.
+A state machine cycles through these states and sends control messages to two scripts controlling the robot.
 The positions were initially determined empirically and later generalised with a set of equations to enable the robot to grab the cylinder from different positions on the table.
 
 \subsection{State Machine}
-As shown in \autoref{fig:statemachine} 5 states were used to control the robots movement: \textit{Approach}, \textit{Grasp}, \textit{Prepare}, \textit{Throw} and \textit{Release}.
+\autoref{fig:statemachine} shows the 5 states that were used to control the robots movement: \textit{Approach}, \textit{Grasp}, \textit{Prepare}, \textit{Throw} and \textit{Release}.
 The first two states let the robot approache and grasp the cylinder.
 In \textit{Prepare} the robot reaches back to prepare for its throw.
 In the last two states the robot executes the actual throwing motion and releases the cylinder at the end.
@@ -24,7 +24,7 @@ These control scripts then choose a configuration according to the current state
 \subsection{Inverse Kinematics}
 To grab the cylinder from different positions on the table the robots inverse kinematics are used to determine the joint angles.
 When a new cylinder is spawned in the simulation its position gets published to a ROS topic.
-If the cylinder position is $(C_x, C_y, C_z)$ and the robots position is $(R_x, R_y, R_z)$ the angle of the first joint can be calculated as follows:
+If the cylinder position is $(C_x, C_y, C_z)$ and the robots position is $(R_x, R_y, R_z)$ the angle of the first joint (\autoref{fig:top}) can be calculated as follows:
 
 \begin{equation}
 \label{simple_equation}
@@ -41,7 +41,7 @@ M_1=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 
 
 \autoref{fig:right} shows the scene from the side.
-Using the empirically determined values from the hard-coded grasp the length of the robots arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated:
+Using the empirically determined values from the initial hard-coded grasp the length of the robots arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated:
 
 \begin{equation}
 \begin{aligned}
