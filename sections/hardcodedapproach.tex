@@ -24,7 +24,7 @@ These control scripts then choose a configuration according to the current state
 \subsection{Inverse Kinematics}
 To grab the cylinder from different positions on the table, the robots inverse kinematics are used to determine the joint angles.
 When a new cylinder is spawned in the simulation, its position gets published to a ROS topic.
-If the cylinder position is $(C_x, C_y, C_z)$ and the robots position is $(R_x, R_y, R_z)$, the angle of the first joint (see \autoref{fig:top}) can be calculated as follows:
+If the cylinder position is $(C_x, C_y, C_z)$ and the robots position is $(R_x, R_y, R_z)$, the angle $\alpha$ for the first joint (see \autoref{fig:top}) can be calculated as follows:
 
 \begin{equation}
 \label{simple_equation}
@@ -34,13 +34,13 @@ M_1=\alpha = arctan((C_y-R_y)/(C_x-R_x))
 \begin{figure}[htpb]
 \centering
 	\includegraphics[width=0.96\linewidth]{figures/top_view.pdf} 
-	\caption{Platform top view}
+	\caption{The platform with the robot arm and the cylinder seen from above.}
 	\vspace{-0.4cm}
 	\label{fig:top}
 \end{figure}
 
-\autoref{fig:right} shows the scene from the side.
-Using the empirically determined configuration for the initial hard-coded grasp, the length of the robot arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated:
+Using the empirically determined configuration for the initial hard-coded grasp, the length of the robot arm segments \textit{Arm\_2} and \textit{Arm\_4} can be calculated.
+For reference see \autoref{fig:right}.
 
 \begin{equation}
 \begin{aligned}
@@ -51,10 +51,11 @@ c=\sqrt{(R_x-C_x)^2+(R_y-C_y)^2}\\
 \end{aligned}
 \end{equation}
 
-With the lengths of the arm segments now known, the remaining angles can be computed using the equations below.
+With the lengths of the arm segments now known, the remaining angles can be computed using \autoref{eq:config}.
 The angles for the third and fifth joint are $0$.
 
 \begin{equation}
+\label{eq:config}
 \begin{aligned}
 M_2=\beta=arccos((a^2+c^2-b^2)/2*a*c)\\
 M_4=\pi-\delta=\pi-arccos((a^2+b^2-c^2)/2*a*b)\\
@@ -66,7 +67,7 @@ M_6=\gamma=arccos((b^2+c^2-a^2)/2*b*c)\\
 \begin{figure}[tpb]
 \centering
 	\includegraphics[width=0.96\linewidth]{figures/right_v.pdf} 
-	\caption{Platform right view}
+	\caption{The platform with the robot arm and the cylinder seen from the side.}
 	\vspace{-0.4cm}
 	\label{fig:right}
 \end{figure}
