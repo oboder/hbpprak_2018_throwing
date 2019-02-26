@@ -16,6 +16,13 @@ This results in the spike rate of the neurons increasing as the absolute positio
 The spike rate of the first six output neurons is passed to the arm joints as a position which produces a movement of the arm.
 The spikes of the seventh output neuron control the release of the cylinder, optimally resulting in the cylinder flying away.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=.95\columnwidth]{figures/spike_train.png}
+\caption{The network spikes depending on the cylinder position input values. The higher the value, the more the spike rate increases. For instance, the neuron spikes more during the preparation state, because the arm is moving the cylinder up.}
+\label{fig:spiketrain}
+\end{figure}
+
 For the evolutionary algorithm, each individual is a list of 21 values, each representing one weight of the network.
 To evaluate the individuals, a throw is simulated and the distance of the cylinder from the table is measured, which represents the fitness of the individual.
 After each individual of a generation is evaluated, the elite, which consists of the best 50\% of the individuals, is selected.
